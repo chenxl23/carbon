@@ -136,11 +136,11 @@ class TestImageProcessing(unittest.TestCase):
 
         cmaps = ['hot', 'inferno', 'plasma', 'magma', 'coolwarm']
 
-        coolwarm = cmaps[1]
+        my_cmap = cmaps[1]
 
-        imshow3d(ax, data_xy, cmap=coolwarm)
-        imshow3d(ax, data_yz, value_direction='x', cmap=coolwarm)
-        imshow3d(ax, data_zx, value_direction='y', pos=ny, cmap=coolwarm)
+        imshow3d(ax, data_xy, cmap=my_cmap)
+        imshow3d(ax, data_yz, value_direction='x', cmap=my_cmap)
+        imshow3d(ax, data_zx, value_direction='y', pos=ny, cmap=my_cmap)
 
         plt.show()
 
