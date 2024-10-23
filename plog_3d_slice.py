@@ -27,7 +27,7 @@ for i in range(n_planes):
     z = i * 0.1  # Calculate z position of the plane
     # Create a 2D numpy array to represent the plane as an image
 
-    plane_image = img_one / 255.0  # Normalize image to [0, 1] for proper coloring
+    plane_image = img_one  # Normalize image to [0, 1] for proper coloring
     x = np.linspace(-radius, radius, 100)  # Set fixed size for x and y to 100 for consistent resolution
     y = np.linspace(-radius, radius, 100)
     x, y = np.meshgrid(x, y)
@@ -37,7 +37,7 @@ for i in range(n_planes):
     plane_image_resized = zoom(plane_image, zoom_factors)
     # plane_image_resized = np.clip(np.repeat(plane_image_resized[..., np.newaxis], 3, axis=2), 0,
     #                               1)  # Clip values to [0, 1] range for RGBA  # Convert to RGB
-    plane_image_resized = plt.cm.inferno(plane_image_resized)[:, :, :3]  # Apply colormap and extract RGB channels
+    plane_image_resized = plt.cm.inferno(plane_image_resized / plane_image_resized.max())[:, :, :3]  # Normalize values before applying colormap  # Apply colormap and extract RGB channels
 
     # Plot the plane as a surface
     ax.plot_surface(x, y, np.full_like(x, z), facecolors=plane_image_resized, alpha=0.5)
