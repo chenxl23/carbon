@@ -5,8 +5,10 @@ from scipy.ndimage import zoom
 from image_process import read_bmp_to_array
 
 # Create figure and 3D axes
-fig = plt.figure()
+fig = plt.figure(figsize=(8, 6))  # Set figure size for aspect ratio
 ax = fig.add_subplot(111, projection='3d')
+
+# ax.set_box_aspect([2, 1, 1])  # Set aspect ratio for x, y, z axes
 
 # Parameters to control the shape
 n_planes = 5  # Number of planes to create
@@ -14,8 +16,11 @@ radius = 20  # Radius of the base circle
 height = 150  # Height of the structure
 
 img_path = r"D:\seadrive\陈显力\我的资料库\调研\碳纳米管薄膜气体温度场\实验数据\20241018\Air 15V×0.12A 0° 41cm 900mlmin\3.2.bmp"
-img_one = read_bmp_to_array(img_path)[:, :, 0]
-# img_one = read_bmp_to_array(img_path)[280:320, 175:510, 0]
+# img_one = read_bmp_to_array(img_path)[:, :, 0]
+img_one = read_bmp_to_array(img_path)[280:320, 175:510, 0]
+
+nx, ny = img_one.shape  # 512, 712, 51
+ax.set_box_aspect([nx, ny, 51])  # X:Y:Z 比例为 50:50:500  # X:Y:Z 比例为 50:50:500
 
 # Generate coordinates for the planes
 for i in range(n_planes):
