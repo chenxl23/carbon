@@ -4,15 +4,12 @@ import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from matplotlib.colors import Normalize
-from scipy.ndimage import rotate
 
 # 被测试的代码
 from image_process import read_bmp_to_array, main, plot_image, read_img_name_from_dir, \
     reco_specific_pattern_file, get_images, stack_img  # 确保导入路径正确
 from imshow3d import imshow3d
 from imshow3d_slice import imshow3d_slice
-from plog_3d_slice import n_planes
 
 PATH_CARBON = r"D:\seadrive\陈显力\我的资料库\调研\碳纳米管薄膜气体温度场\实验数据\20241018\Air 15V×0.12A 0° 41cm 900mlmin"
 
@@ -42,8 +39,8 @@ class TestImageProcessing(unittest.TestCase):
     def test_plot_img(self):
         list_path = read_img_name_from_dir(PATH_CARBON)
         img = read_bmp_to_array(list_path[0])
-        # img_partly = img[200:400, 150:300, :]
-        img_partly = img
+        img_partly = img[200:400, 150:300, :]
+        # img_partly = img
         plot_image(img_partly)
         plt.show()
 
@@ -116,7 +113,6 @@ class TestImageProcessing(unittest.TestCase):
         ax = fig.add_subplot(projection='3d')
         ax.set(xlabel="x", ylabel="y", zlabel="z")
 
-
         images = get_images(PATH_CARBON)
 
         # 使用numpy的stack函数将2D图像堆叠成3D数组
@@ -152,7 +148,6 @@ class TestImageProcessing(unittest.TestCase):
         ax = fig.add_subplot(projection='3d')
         ax.set(xlabel="x", ylabel="y", zlabel="z")
 
-
         images = get_images(PATH_CARBON)
 
         # 使用numpy的stack函数将2D图像堆叠成3D数组
@@ -178,8 +173,39 @@ class TestImageProcessing(unittest.TestCase):
 
         plt.show()
 
+    def test_plot_3d_slide_by_imshow3d_py(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        ax.set(xlabel="x", ylabel="y", zlabel="z")
 
+        images = get_images(PATH_CARBON)
 
+        # 使用numpy的stack函数将2D图像堆叠成3D数组
+        # axis=2表示沿着第三个维度堆叠
+        images_3d = stack_img(images)
+
+        slide_w = 10
+        list_width = np.array([280, 320])
+        list_width -= slide_w
+        images_3d = images_3d[list_width[0]:list_width[1], 175:510, :, 1]
+
+        nx, ny, nz = images_3d.shape  # 512, 712, 51
+        # ax.set_box_aspect([zz, xx, yy]) # 512, 712, 51
+        ax.set_box_aspect([nx, ny, nz])  # X:Y:Z 比例为 50:50:500  # X:Y:Z 比例为 50:50:500
+
+        data_xy = images_3d[:, :, 1]
+        data_xy = data_xy.T
+
+        cmaps = ['hot', 'inferno', 'plasma', 'magma', 'coolwarm']
+
+        my_cmap = cmaps[1]
+
+        n_planes_k = 16
+        for i in range(n_planes_k):
+            z = i * 5  # Calculate z position of the plane
+            imshow3d(ax, data_xy, pos=z, cmap=my_cmap)
+
+        plt.show()
 
 
 if __name__ == '__main__':
