@@ -10,6 +10,9 @@ from scipy.ndimage import rotate
 # 被测试的代码
 from image_process import read_bmp_to_array, main, plot_image, read_img_name_from_dir, \
     reco_specific_pattern_file, get_images, stack_img  # 确保导入路径正确
+from imshow3d import imshow3d
+from imshow3d_slice import imshow3d_slice
+from plog_3d_slice import n_planes
 
 PATH_CARBON = r"D:\seadrive\陈显力\我的资料库\调研\碳纳米管薄膜气体温度场\实验数据\20241018\Air 15V×0.12A 0° 41cm 900mlmin"
 
@@ -144,49 +147,37 @@ class TestImageProcessing(unittest.TestCase):
 
         plt.show()
 
+    def test_plot_3d_slide(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        ax.set(xlabel="x", ylabel="y", zlabel="z")
 
-def imshow3d(ax, array, value_direction='z', pos=0, norm=None, cmap=None):
-    """
-    Display a 2D array as a  color-coded 2D image embedded in 3d.
 
-    The image will be in a plane perpendicular to the coordinate axis *value_direction*.
+        images = get_images(PATH_CARBON)
 
-    Parameters
-    ----------
-    ax : Axes3D
-        The 3D Axes to plot into.
-    array : 2D numpy array
-        The image values.
-    value_direction : {'x', 'y', 'z'}
-        The axis normal to the image plane.
-    pos : float
-        The numeric value on the *value_direction* axis at which the image plane is
-        located.
-    norm : `~matplotlib.colors.Normalize`, default: Normalize
-        The normalization method used to scale scalar data. See `imshow()`.
-    cmap : str or `~matplotlib.colors.Colormap`, default: :rc:`image.cmap`
-        The Colormap instance or registered colormap name used to map scalar data
-        to colors.
-    """
-    if norm is None:
-        norm = Normalize()
-    colors = plt.get_cmap(cmap)(norm(array))
+        # 使用numpy的stack函数将2D图像堆叠成3D数组
+        # axis=2表示沿着第三个维度堆叠
+        images_3d = stack_img(images)
 
-    if value_direction == 'x':
-        nz, ny = array.shape
-        zi, yi = np.mgrid[0:nz + 1, 0:ny + 1]
-        xi = np.full_like(yi, pos)
-    elif value_direction == 'y':
-        nx, nz = array.shape
-        xi, zi = np.mgrid[0:nx + 1, 0:nz + 1]
-        yi = np.full_like(zi, pos)
-    elif value_direction == 'z':
-        ny, nx = array.shape
-        yi, xi = np.mgrid[0:ny + 1, 0:nx + 1]
-        zi = np.full_like(xi, pos)
-    else:
-        raise ValueError(f"Invalid value_direction: {value_direction!r}")
-    ax.plot_surface(xi, yi, zi, rstride=1, cstride=1, facecolors=colors, shade=False)
+        images_3d = images_3d[280:320, 175:510, :, 1]
+
+        nx, ny, nz = images_3d.shape  # 512, 712, 51
+        # ax.set_box_aspect([zz, xx, yy]) # 512, 712, 51
+        ax.set_box_aspect([nx, ny, nz])  # X:Y:Z 比例为 50:50:500  # X:Y:Z 比例为 50:50:500
+
+        data_xy = images_3d[:, :, 1]
+
+        cmaps = ['hot', 'inferno', 'plasma', 'magma', 'coolwarm']
+
+        my_cmap = cmaps[1]
+
+        n_planes_k = 6
+        for i in range(n_planes_k):
+            z = i * 10  # Calculate z position of the plane
+            imshow3d_slice(ax, data_xy, myzi=z, cmap=my_cmap)
+
+        plt.show()
+
 
 
 

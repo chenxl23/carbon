@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
 from scipy.ndimage import zoom
 
 from image_process import read_bmp_to_array
@@ -31,6 +32,13 @@ for i in range(n_planes):
     x = np.linspace(-radius, radius, 100)  # Set fixed size for x and y to 100 for consistent resolution
     y = np.linspace(-radius, radius, 100)
     x, y = np.meshgrid(x, y)
+    # ny, nx = array.shape
+    # yi, xi = np.mgrid[0:ny + 1, 0:nx + 1]
+    # zi = np.full_like(xi, pos)
+    # ax.plot_surface(xi, yi, zi, rstride=1, cstride=1, facecolors=colors, shade=False)
+    # norm = Normalize()
+    # cmap = 'inferno'
+    # colors = plt.get_cmap(cmap)(norm(img_one))
 
     # Resize plane_image to match x and y shape
     zoom_factors = (x.shape[0] / plane_image.shape[0], y.shape[1] / plane_image.shape[1])
